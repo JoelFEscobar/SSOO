@@ -1,0 +1,7 @@
+mat acc(trame.row,trame.cols cv_8v){
+acc.sendto(scalar(0))
+se va sumando
+
+
+acc += ast;
+}

@@ -1,0 +1,6 @@
+usuario grupo otros
+- rwx    rwx   rwx
+  101    110   011
+
+control de trabajo:
+PS =  procesos ejecutados en el terminal actual
