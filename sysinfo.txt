@@ -1,0 +1,65 @@
+
+[1m[1m[35m-> Información del Sistema para joel-Lenovo-ideapad-330-15ICH <- (B[m
+  [1m[36m-> Script actualizado el 02/11/21 07:22:21 WET por joel <-(B[m
+    [1m[36m-> Autor: Joel Francisco Escobar Socas <-(B[m
+
+(B[0;4m[1m[32mVersión del sistema(B[m
+Linux joel-Lenovo-ideapad-330-15ICH 5.4.0-89-generic #100~18.04.1-Ubuntu SMP Wed Sep 29 10:59:42 UTC 2021 x86_64 x86_64 x86_64 GNU/Linux
+
+(B[0;4m[1m[32mTiempo de encendido del sistema(B[m
+ 19:22:21 up 15 min,  1 user,  load average: 0,97, 1,13, 0,78
+
+(B[0;4m[1m[32mEspacio Ocupado por Particiones y Discos Duros(B[m
+S.ficheros     Tamaño Usados  Disp Uso% Montado en
+udev             3,8G      0  3,8G   0% /dev
+tmpfs            784M   2,1M  782M   1% /run
+/dev/sda5         31G    28G  2,0G  94% /
+tmpfs            3,9G    97M  3,8G   3% /dev/shm
+tmpfs            5,0M   4,0K  5,0M   1% /run/lock
+tmpfs            3,9G      0  3,9G   0% /sys/fs/cgroup
+/dev/loop0       141M   141M     0 100% /snap/gnome-3-26-1604/102
+/dev/loop4       100M   100M     0 100% /snap/core/11993
+/dev/loop1       177M   177M     0 100% /snap/krita/64
+/dev/loop2        62M    62M     0 100% /snap/core20/1081
+/dev/loop3        78M    78M     0 100% /snap/discord/128
+/dev/loop6       141M   141M     0 100% /snap/gnome-3-26-1604/104
+/dev/loop5       217M   217M     0 100% /snap/code/77
+/dev/loop7        56M    56M     0 100% /snap/core18/2128
+/dev/loop9       139M   139M     0 100% /snap/krita/63
+/dev/loop8       163M   163M     0 100% /snap/spotify/53
+/dev/loop10      640K   640K     0 100% /snap/gnome-logs/106
+/dev/loop11      768K   768K     0 100% /snap/gnome-characters/726
+/dev/loop12      243M   243M     0 100% /snap/gnome-3-38-2004/76
+/dev/loop13      2,7M   2,7M     0 100% /snap/gnome-system-monitor/169
+/dev/loop14       56M    56M     0 100% /snap/core18/2246
+/dev/loop15      128K   128K     0 100% /snap/bare/5
+/dev/loop17      145M   145M     0 100% /snap/chromium/1801
+/dev/loop16      217M   217M     0 100% /snap/code/78
+/dev/loop19      6,3M   6,3M     0 100% /snap/curl/412
+/dev/loop20      180M   180M     0 100% /snap/spotify/46
+/dev/loop21      6,3M   6,3M     0 100% /snap/curl/371
+/dev/loop23      2,5M   2,5M     0 100% /snap/gnome-calculator/826
+/dev/loop24      145M   145M     0 100% /snap/chromium/1810
+/dev/loop25       83M    83M     0 100% /snap/discord/130
+/dev/loop26      165M   165M     0 100% /snap/gnome-3-28-1804/161
+/dev/loop22      100M   100M     0 100% /snap/core/11798
+/dev/loop18      219M   219M     0 100% /snap/gnome-3-34-1804/66
+/dev/loop28      2,5M   2,5M     0 100% /snap/gnome-calculator/884
+/dev/loop27      261M   261M     0 100% /snap/kde-frameworks-5-core18/32
+/dev/loop29      163M   163M     0 100% /snap/gnome-3-28-1804/145
+/dev/loop33      768K   768K     0 100% /snap/gnome-characters/761
+/dev/loop31      219M   219M     0 100% /snap/gnome-3-34-1804/72
+/dev/loop32       66M    66M     0 100% /snap/gtk-common-themes/1519
+/dev/loop30       62M    62M     0 100% /snap/core20/1169
+/dev/loop36      640K   640K     0 100% /snap/gnome-logs/103
+/dev/loop34      2,5M   2,5M     0 100% /snap/gnome-system-monitor/163
+/dev/loop35       66M    66M     0 100% /snap/gtk-common-themes/1515
+/dev/sda2         96M    47M   50M  48% /boot/efi
+tmpfs            784M    20K  784M   1% /run/user/121
+tmpfs            784M    52K  784M   1% /run/user/1000
+
+(B[0;4m[1m[32mEspacio ocupado en los Directorios(B[m
+Bienvenido [1m[35musuario(B[m de joel-Lenovo-ideapad-330-15ICH.
+El espacio de su directorio es: 
+12G	/home/joel
+
