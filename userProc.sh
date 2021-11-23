@@ -25,7 +25,11 @@ opcion_t=0
 
 
 #────────────────────────┤ Funciones ├──────────────────────────────
-
+seconds_to_time()
+{
+  TIME="$auxN"
+  echo | awk -v "S=$TIME" '{printf "%02d:%02d:%02d",S/(60*60),S%(60*60)/60,S%60}'
+}
 
 lista=$(ps -A -o user --no-headers|sort -u |uniq )
 exist=$(cat /etc/passwd | tr -s ':' ' ' | cut -d ' ' -f1)
@@ -47,7 +51,7 @@ lista(){
             username=$(ps -u $i -o user:20,uid,gid,pid,cputime --sort=cputime --no-headers|tail -n 1 | uniq)
             numproc=$(ps -u $i | wc -l|uniq )
             printf "${username}\t${numproc}\n"
-      done
+       done
   done
 
 
@@ -125,7 +129,9 @@ while [ "$1" != "" ]; do
       echo " Seleccionando el Número"
       opcion_t=1
       shift
-      N=$1
+      auxN=$1
+      echo "auxN: $auxN"
+      N=$(seconds_to_time)
       ;;
 
     * )
