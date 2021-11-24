@@ -24,6 +24,7 @@ opcion_help=0
 opcion_t=0
 opcion_usr=0
 opcion_filter=0
+opcion_inv=0
 
 #────────────────────────┤ Funciones ├──────────────────────────────
 seconds_to_time()
@@ -75,44 +76,7 @@ ProcessUsr(){
 
 }
 
-# filter_func(){
-#   echo "Funcion que filtra usuarios especificos"
-#   for i in $lista; do
-#     for h in $usuario_parametro; do
-#       if [[ "$i" == "$h" ]]; then
-#         echo "usuarios filtro = $k "
 
-#         e_time=$(ps -u $h -o user,pid,gid,time --no-headers| sort -u | tr -s ' ' ' ' | cut -d ' ' -f4)
-#         for j in $e_time; do
-#           if [[ "$j">"$N" ]]; then 
-#             if [ "$opcion_usr" = "1" ]; then
-#               for k in $usrconect; do
-#                 if [[ "$h" == "$k" ]]; then
-#                   user_match="$h "
-#                 fi
-#               done
-#             else
-#               user_match="$h " 
-#             fi
-#             #echo "Para el usuario $i -> $j es mayor que $N
-#           fi
-#         done
-
-
-#       fi
-#     done
-
-#     for i in $user_match; do
-#             username=$(ps -u $i -o user:20,uid,gid,cputime:10 --sort=cputime --no-headers|tail -n 1 | uniq)
-#             pidold=$(ps -u $i -o pid --sort=cputime --no-headers|tail -n 1 | uniq)
-#             numproc=$(ps -u $i | wc -l|uniq )
-#             printf "${username}\t${pidold}\t\t\t${numproc}\n"
-#     done
-
-#   done
-
-
-# }
 
 #Función error_exit que controla la salida de errores
 error_exit(){
@@ -205,6 +169,12 @@ while [ "$1" != "" ]; do
       echo "$usuario_parametro"
       ;;
 
+    -inv )
+      echo "Ordenando por INVERSA"
+      opcion_inv=1
+      lista=$(ps -A -o user --no-headers|sort -r |uniq)
+      ;;
+
     * )
       error_exit 1
       exit 4
@@ -228,6 +198,8 @@ echo "N sera: $N"
 elif [ "$opcion_usr" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ]; then 
 ProcessUsr |uniq
 elif [ "$opcion_filter" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ] && [ "$opcion_usr" = "0" ]; then 
+ProcessUsr |uniq 
+elif [ "$opcion_inv" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ] && [ "$opcion_usr" = "0" ]; then 
 ProcessUsr |uniq 
 
 else
