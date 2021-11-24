@@ -26,7 +26,7 @@ opcion_usr=0
 opcion_filter=0
 opcion_inv=0
 opcion_pid=0
-
+opcion_count=0
 #────────────────────────┤ Funciones ├──────────────────────────────
 seconds_to_time()
 {
@@ -44,8 +44,12 @@ cabecera(){
 
 ProcessUsr(){
   cabecera
-  echo "Función que muestra la lista de procesos de cpu "
-  echo -e "$COLOR_CIAN$(ps -o user:20,uid,gid,cputime | head -n 1)\t PID_OLD_PROCESS\tNUM_PROCESS$TEXT_RESET"
+  if [[ "$opcion_count" = "1" ]];then
+    echo -e "$COLOR_CIAN$(ps -o user:20| head -n 1)\t\tNUM_PROCESS$TEXT_RESET"
+  else
+    echo -e "$COLOR_CIAN$(ps -o user:20,uid,gid,pid,cputime | head -n 1)\t\tNUM_PROCESS$TEXT_RESET"
+  fi
+  
   echo "$COLOR_MAGENTA────────────────────────────────────────────────────────────────────────────────────────────────────$TEXT_RESET"
 
   for i in $lista; do
@@ -65,26 +69,23 @@ ProcessUsr(){
         fi
       done
 
-      for i in $user_match; do
-        for j in $(ps -u $i -o pid --sort=cputime --no-headers|tail -n 1 | uniq);do
-          aux=" " 
-          if [[ "$j" > "$aux" ]]; then
-            aux="$j "
-          else
-            aux="$aux "
-          fi
-          
-          
-        done
-            
-            username=$(ps -u $i -o user:20,uid,gid,pid,cputime:10 --sort=cputime --no-headers|tail -n 1 | uniq)
-            pidold=$(ps -u $i -o pid --sort=cputime --no-headers|tail -n 1 | uniq)
-            numproc=$(ps -u $i | wc -l|uniq )
-            printf "${username}\t${pidold}\t\t\t${numproc}\n"
+      for i in $user_match; do 
+        if [[ "$opcion_pid" = "1" ]]; then
+          username=$(ps -u $i -o user:20,uid,gid,pid,cputime:10 --no-headers|tr -s ' ' ' ' |sort -k4 -n| head -n 1 | uniq)
+          numproc=$(ps -u $i | wc -l|uniq )
+          printf "${username}\t${numproc}\n"
+        elif [[ "$opcion_count" = "1" ]]; then
+          username=$(ps -u $i -o user:20 --sort=cputime --no-headers|tail -n 1 | uniq)
+          numproc=$(ps -u $i | wc -l|uniq )
+          printf "${username}\t\t${numproc}\n"
+        else
+          username=$(ps -u $i -o user:20,uid,gid,pid,cputime:10 --sort=cputime --no-headers|tail -n 1 | uniq)
+          numproc=$(ps -u $i | wc -l|uniq )
+          printf "${username}\t${numproc}\n"
+        fi           
+        
       done
-       for i in $aux;do
-        echo "el vector aux es: $i"
-        done 
+
       
   done
        
@@ -196,6 +197,12 @@ while [ "$1" != "" ]; do
       echo "Ordenando por pid"
       opcion_pid=1
       ;;
+
+    -count )
+      echo "Mostrando solo el numero de procesos por usuario"
+      opcion_count=1
+      ;;
+
     * )
       error_exit 1
       exit 4
@@ -223,7 +230,7 @@ ProcessUsr |uniq
 elif [ "$opcion_inv" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ] && [ "$opcion_usr" = "0" ]; then 
 ProcessUsr| uniq 
 elif [ "$opcion_pid" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_inv" = "0" ] && [  "$opcion_filter" = "0" ]; then 
-ProcessUsr| sort -r |uniq
+ProcessUsr|uniq
 else
 error_exit 2
 fi
