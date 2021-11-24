@@ -19,6 +19,9 @@ TEXT_ULINE=$(tput sgr 0 1)
 #────────────────────────┤ Variables ├──────────────────────────────
 
 N="00:00:01"
+lista=$(ps -A -o user --no-headers|sort -u |uniq )
+exist=$(cat /etc/passwd | tr -s ':' ' ' | cut -d ' ' -f1)
+usrconect=$(who | tr -s ' ' ' '|cut -d ' ' -f1 )
 
 opcion_help=0
 opcion_t=0
@@ -34,9 +37,7 @@ seconds_to_time()
   echo | awk -v "S=$TIME" '{printf "%02d:%02d:%02d",S/(60*60),S%(60*60)/60,S%60}'
 }
 
-lista=$(ps -A -o user --no-headers|sort -u |uniq )
-exist=$(cat /etc/passwd | tr -s ':' ' ' | cut -d ' ' -f1)
-usrconect=$(who | tr -s ' ' ' '|cut -d ' ' -f1 )
+
 
 cabecera(){
   echo "Autor: Joel Francisco Escobar Socas"
@@ -89,12 +90,7 @@ ProcessUsr(){
       
   done
        
-        
-
-
 }
-
-
 
 #Función error_exit que controla la salida de errores
 error_exit(){
@@ -180,11 +176,12 @@ while [ "$1" != "" ]; do
     -u )
       echo "Filtrando por usuarios especificados"
       opcion_filter=1
-      echo "lista usuarios: $lista"
-      shift
-      lista="$1 $2 $3 "
-      
-      echo "$usuario_parametro"
+
+      while [[ $2 != "" ]]; do
+        usuario_parametro+="$2 "
+        shift
+      done
+      lista=$usuario_parametro
       ;;
 
     -inv )
@@ -193,10 +190,6 @@ while [ "$1" != "" ]; do
       lista=$(ps -A -o user --no-headers|sort -r |uniq)
       ;;
 
-    -pid )
-      echo "Ordenando por pid"
-      opcion_pid=1
-      ;;
 
     -count )
       echo "Mostrando solo el numero de procesos por usuario"
@@ -225,8 +218,8 @@ ProcessUsr |uniq
 echo "N sera: $N"
 elif [ "$opcion_usr" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ]; then 
 ProcessUsr |uniq
-elif [ "$opcion_filter" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ] && [ "$opcion_usr" = "0" ]; then 
-ProcessUsr |uniq 
+elif [ "$opcion_filter" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ]; then 
+ProcessUsr |uniq
 elif [ "$opcion_inv" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ] && [ "$opcion_usr" = "0" ]; then 
 ProcessUsr| uniq 
 elif [ "$opcion_pid" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_inv" = "0" ] && [  "$opcion_filter" = "0" ]; then 
