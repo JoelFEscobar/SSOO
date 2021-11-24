@@ -25,6 +25,7 @@ opcion_t=0
 opcion_usr=0
 opcion_filter=0
 opcion_inv=0
+opcion_pid=0
 
 #────────────────────────┤ Funciones ├──────────────────────────────
 seconds_to_time()
@@ -65,13 +66,29 @@ ProcessUsr(){
       done
 
       for i in $user_match; do
-            username=$(ps -u $i -o user:20,uid,gid,cputime:10 --sort=cputime --no-headers|tail -n 1 | uniq)
+        for j in $(ps -u $i -o pid --sort=cputime --no-headers|tail -n 1 | uniq);do
+          aux=" " 
+          if [[ "$j" > "$aux" ]]; then
+            aux="$j "
+          else
+            aux="$aux "
+          fi
+          
+          
+        done
+            
+            username=$(ps -u $i -o user:20,uid,gid,pid,cputime:10 --sort=cputime --no-headers|tail -n 1 | uniq)
             pidold=$(ps -u $i -o pid --sort=cputime --no-headers|tail -n 1 | uniq)
             numproc=$(ps -u $i | wc -l|uniq )
             printf "${username}\t${pidold}\t\t\t${numproc}\n"
       done
+       for i in $aux;do
+        echo "el vector aux es: $i"
+        done 
+      
   done
-
+       
+        
 
 
 }
@@ -175,6 +192,10 @@ while [ "$1" != "" ]; do
       lista=$(ps -A -o user --no-headers|sort -r |uniq)
       ;;
 
+    -pid )
+      echo "Ordenando por pid"
+      opcion_pid=1
+      ;;
     * )
       error_exit 1
       exit 4
@@ -200,8 +221,9 @@ ProcessUsr |uniq
 elif [ "$opcion_filter" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ] && [ "$opcion_usr" = "0" ]; then 
 ProcessUsr |uniq 
 elif [ "$opcion_inv" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ] && [ "$opcion_usr" = "0" ]; then 
-ProcessUsr |uniq 
-
+ProcessUsr| uniq 
+elif [ "$opcion_pid" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_inv" = "0" ] && [  "$opcion_filter" = "0" ]; then 
+ProcessUsr| sort -r |uniq
 else
 error_exit 2
 fi
