@@ -20,6 +20,7 @@ TEXT_ULINE=$(tput sgr 0 1)
 
 N="00:00:01"
 lista=$(ps -A -o user --no-headers|sort -u |uniq )
+copia_lista_usuarios=$(ps -A -o user --no-headers|sort -u |uniq)
 exist=$(cat /etc/passwd | tr -s ':' ' ' | cut -d ' ' -f1)
 usrconect=$(who | tr -s ' ' ' '|cut -d ' ' -f1 )
 
@@ -31,7 +32,7 @@ opcion_inv=0
 opcion_pid=0
 opcion_count=0
 #────────────────────────┤ Funciones ├──────────────────────────────
-seconds_to_time()
+Seconds_format_xx()
 {
   TIME="$auxN"
   echo | awk -v "S=$TIME" '{printf "%02d:%02d:%02d",S/(60*60),S%(60*60)/60,S%60}'
@@ -71,11 +72,7 @@ ProcessUsr(){
       done
 
       for i in $user_match; do 
-        if [[ "$opcion_pid" = "1" ]]; then
-          username=$(ps -u $i -o user:20,uid,gid,pid,cputime:10 --no-headers|tr -s ' ' ' ' |sort -k4 -n| head -n 1 | uniq)
-          numproc=$(ps -u $i | wc -l|uniq )
-          printf "${username}\t${numproc}\n"
-        elif [[ "$opcion_count" = "1" ]]; then
+        if [[ "$opcion_count" = "1" ]]; then
           username=$(ps -u $i -o user:20 --sort=cputime --no-headers|tail -n 1 | uniq)
           numproc=$(ps -u $i | wc -l|uniq )
           printf "${username}\t\t${numproc}\n"
@@ -149,8 +146,9 @@ help_func(){
 
 
 
-# #────────────────────────┤ Llamada al Main ├──────────────────────────────
-
+#────────────────────────┤ Función Main ├──────────────────────────────
+################################################################################################################
+#────────────────────────┤ Gestión de las opciones pasadas por línea de comando ├──────────────────────────────
 clear
 while [ "$1" != "" ]; do
   case $1 in
@@ -165,7 +163,7 @@ while [ "$1" != "" ]; do
       shift
       auxN=$1
       echo "auxN: $auxN"
-      N=$(seconds_to_time)
+      N=$(Seconds_format_xx)
       ;;
 
     -usr )
@@ -181,7 +179,16 @@ while [ "$1" != "" ]; do
         usuario_parametro+="$2 "
         shift
       done
-      lista=$usuario_parametro
+      
+      for i in $usuario_parametro; do
+        for j in $copia_lista_usuarios; do
+          if [[ "$i" == "$j" ]]; then
+            lista=$usuario_parametro
+          fi
+        done
+      done
+  
+ 
       ;;
 
     -inv )
@@ -205,25 +212,65 @@ while [ "$1" != "" ]; do
     shift
 done
 
-#────────────────────────┤ Gestión de las opciones pasadas por línea de comando ├──────────────────────────────
-#Opcion por defecto (00)
-if [ "$opcion_help" = "0" ] && [ "$opcion_t" = "0" ] ; then
+#────────────────────────┤ Control de las diferentes combinaciones ├──────────────────────────────
+########################################################################################################
+#────────────────────────┤ Caso Base ├──────────────────────────────
+# Opcion por defecto (00 00 00)
+if [ "$opcion_help" = "0" ] && [ "$opcion_t" = "0" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_filter" = "0" ] && [ "$opcion_inv" = "0" ] && [ "$opcion_count" = "0" ]; then
 ProcessUsr|uniq
-# Si solo llamamos a ayuda (10)
-elif [ "$opcion_help" = "1" ] && [ "$opcion_t" = "0" ]; then
+# Si llamamos a Ayuda (10 00 00)
+elif [ "$opcion_help" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_filter" = "0" ] && [ "$opcion_inv" = "0" ] && [ "$opcion_count" = "0" ]; then
 help_func
-# Si le pasamos el número de segundos a filtrar (01)
-elif [ "$opcion_help" = "0" ] && [ "$opcion_t" = "1" ]; then
+# Si le pasamos el número de segundos a filtrar (01 00 00)
+elif [ "$opcion_help" = "0" ] && [ "$opcion_t" = "1" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_filter" = "0" ] && [ "$opcion_inv" = "0" ] && [ "$opcion_count" = "0" ]; then
 ProcessUsr |uniq
-echo "N sera: $N"
-elif [ "$opcion_usr" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ]; then 
+# Si lo queremos ordenar por usuarios conectados (00 10 00)
+elif [ "$opcion_help" = "0" ] && [ "$opcion_t" = "0" ] && [ "$opcion_usr" = "1" ] && [ "$opcion_filter" = "0" ] && [ "$opcion_inv" = "0" ] && [ "$opcion_count" = "0" ]; then
 ProcessUsr |uniq
-elif [ "$opcion_filter" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ]; then 
+# Si filtramos usuarios especificos (00 01 00)
+elif [ "$opcion_help" = "0" ] && [ "$opcion_t" = "0" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_filter" = "1" ] && [ "$opcion_inv" = "0" ] && [ "$opcion_count" = "0" ]; then
 ProcessUsr |uniq
-elif [ "$opcion_inv" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ] && [ "$opcion_usr" = "0" ]; then 
+#Si ordenamos inversamente (00 00 10)
+elif [ "$opcion_help" = "0" ] && [ "$opcion_t" = "0" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_filter" = "0" ] && [ "$opcion_inv" = "1" ] && [ "$opcion_count" = "0" ]; then
 ProcessUsr| uniq 
-elif [ "$opcion_pid" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_inv" = "0" ] && [  "$opcion_filter" = "0" ]; then 
+#Si contamos el numero de procesos
+elif [ "$opcion_help" = "0" ] && [ "$opcion_t" = "0" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_filter" = "0" ] && [ "$opcion_inv" = "0" ] && [ "$opcion_count" = "1" ]; then
 ProcessUsr|uniq
+########################################################################################################
+#────────────────────────┤ Combinaciones posibles ├──────────────────────────────
+#Es posible filtrar para un tiempo especifico y invertir todo
+elif [ "$opcion_help" = "0" ] && [ "$opcion_t" = "1" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_filter" = "0" ] && [ "$opcion_inv" = "1" ] && [ "$opcion_count" = "0" ]; then
+ProcessUsr|uniq
+#Es posible filtrar por usuario y hacer la inversa
+#Help con T
+elif [ "$opcion_help" = "0" ] && [ "$opcion_t" = "1" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_filter" = "1" ] && [ "$opcion_inv" = "1" ] && [ "$opcion_count" = "0" ]; then
+ProcessUsr|uniq
+
+########################################################################################################
+#────────────────────────┤ Casos Improbables ├──────────────────────────────
+#usar Help con otros comandos
+#Help con T
+elif [ "$opcion_help" = "1" ] && [ "$opcion_t" = "1" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_filter" = "0" ] && [ "$opcion_inv" = "0" ] && [ "$opcion_count" = "0" ]; then
+error_exit 2
+#Help con usr
+elif [ "$opcion_help" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_usr" = "1" ] && [ "$opcion_filter" = "0" ] && [ "$opcion_inv" = "0" ] && [ "$opcion_count" = "0" ]; then
+error_exit 2
+#Help con -u
+elif [ "$opcion_help" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_filter" = "1" ] && [ "$opcion_inv" = "0" ] && [ "$opcion_count" = "0" ]; then
+error_exit 2
+#Help con inv
+elif [ "$opcion_help" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_filter" = "0" ] && [ "$opcion_inv" = "1" ] && [ "$opcion_count" = "0" ]; then
+error_exit 2
+#Help con count
+elif [ "$opcion_help" = "1" ] && [ "$opcion_t" = "1" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_filter" = "0" ] && [ "$opcion_inv" = "0" ] && [ "$opcion_count" = "1" ]; then
+error_exit 2
+# Imposible filtrar para un usuario especifico y calcular para usuarios online
+elif [ "$opcion_help" = "0" ] && [ "$opcion_t" = "0" ] && [ "$opcion_usr" = "1" ] && [ "$opcion_filter" = "1" ] && [ "$opcion_inv" = "0" ] && [ "$opcion_count" = "1" ]; then
+error_exit 2
+# Imposible filtrar para un usuario especifico y un tiempo especifico
+elif [ "$opcion_help" = "0" ] && [ "$opcion_t" = "1" ] && [ "$opcion_usr" = "0" ] && [ "$opcion_filter" = "1" ] && [ "$opcion_inv" = "0" ] && [ "$opcion_count" = "1" ]; then
+error_exit 2
+
 else
 error_exit 2
 fi
