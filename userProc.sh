@@ -22,7 +22,8 @@ N="00:00:01"
 
 opcion_help=0
 opcion_t=0
-
+opcion_usr=0
+opcion_filter=0
 
 #────────────────────────┤ Funciones ├──────────────────────────────
 seconds_to_time()
@@ -33,30 +34,47 @@ seconds_to_time()
 
 lista=$(ps -A -o user --no-headers|sort -u |uniq )
 exist=$(cat /etc/passwd | tr -s ':' ' ' | cut -d ' ' -f1)
+usrconect=$(who | tr -s ' ' ' '|cut -d ' ' -f1 )
 
-lista(){
+cabecera(){
+  echo "Autor: Joel Francisco Escobar Socas"
+}
+
+ProcessUsr(){
+  cabecera
   echo "Función que muestra la lista de procesos de cpu "
-  echo -e "$COLOR_CIAN$(ps -o user:20,uid,gid,pid,cputime | head -n 1)\tNumProccess$TEXT_RESET"
-
+  echo -e "$COLOR_CIAN$(ps -o user:20,uid,gid,cputime | head -n 1)\t PID_OLD_PROCESS\tNUM_PROCESS$TEXT_RESET"
+  echo "$COLOR_MAGENTA────────────────────────────────────────────────────────────────────────────────────────────────────$TEXT_RESET"
 
   for i in $lista; do
     e_time=$(ps -u $i -o user,pid,gid,time --no-headers| sort -u | tr -s ' ' ' ' | cut -d ' ' -f4)
       for j in $e_time; do
         if [[ "$j">"$N" ]]; then 
-          user_match="$i " 
+          if [ "$opcion_usr" = "1" ]; then
+            for k in $usrconect; do
+              if [[ "$i" == "$k" ]]; then
+                user_match="$i "
+              fi
+            done
+          else
+            user_match="$i " 
+          fi
           #echo "Para el usuario $i -> $j es mayor que $N
         fi
       done
+
       for i in $user_match; do
-            username=$(ps -u $i -o user:20,uid,gid,pid,cputime --sort=cputime --no-headers|tail -n 1 | uniq)
+            username=$(ps -u $i -o user:20,uid,gid,cputime:10 --sort=cputime --no-headers|tail -n 1 | uniq)
+            pidold=$(ps -u $i -o pid --sort=cputime --no-headers|tail -n 1 | uniq)
             numproc=$(ps -u $i | wc -l|uniq )
-            printf "${username}\t${numproc}\n"
-       done
+            printf "${username}\t${pidold}\t\t\t${numproc}\n"
+      done
   done
 
 
 
 }
+
 
 #Función error_exit que controla la salida de errores
 error_exit(){
@@ -134,6 +152,16 @@ while [ "$1" != "" ]; do
       N=$(seconds_to_time)
       ;;
 
+    -usr )
+      echo "Filtrando por usuarios conectados a $HOSTNAME"
+      opcion_usr=1
+      ;;
+
+
+      
+      echo "$usuario_parametro"
+      ;;
+
     * )
       error_exit 1
       exit 4
@@ -145,15 +173,18 @@ done
 
 #────────────────────────┤ Gestión de las opciones pasadas por línea de comando ├──────────────────────────────
 #Opcion por defecto (00)
-if [ "$opcion_help" = "0" ] && [ "$opcion_t" = "0" ]; then
-lista|uniq
+if [ "$opcion_help" = "0" ] && [ "$opcion_t" = "0" ] ; then
+ProcessUsr|uniq
 # Si solo llamamos a ayuda (10)
 elif [ "$opcion_help" = "1" ] && [ "$opcion_t" = "0" ]; then
 help_func
 # Si le pasamos el número de segundos a filtrar (01)
 elif [ "$opcion_help" = "0" ] && [ "$opcion_t" = "1" ]; then
-lista |uniq
+ProcessUsr |uniq
 echo "N sera: $N"
+elif [ "$opcion_usr" = "1" ] && [ "$opcion_t" = "0" ] && [ "$opcion_help" = "0" ]; then 
+ProcessUsr |uniq
+
 
 else
 error_exit 2
